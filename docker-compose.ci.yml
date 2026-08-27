@@ -10,17 +10,17 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-     healthcheck:
+    healthcheck:
       test: ["CMD","python","-c","import urllib.request;urllib.request.urlopen('http://localhost:5000/')"]
       interval: 10s
       timeout: 3s
       retries: 5
 
-redis:
+  redis:
     image: redis:alpine
     command: redis-server --port 6380
-    healtcheck:
-    test: ["CMD", "redis-cli", "-p", "6380", "ping"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "-p", "6380", "ping"]
       interval: 10s
       timeout: 3s
       retries: 5
