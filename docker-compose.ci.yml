@@ -17,11 +17,11 @@ services:
       retries: 5
 
 redis:
-  image: redis:alpine
-  command: redis-server --port 6380
-  healtcheck:
-  test: ["CMD", "redis-cli", "-p", "6380", "ping"]
-    interval: 10s
-    timeout: 3s
-    retries: 5
+    image: redis:alpine
+    command: redis-server --port 6380
+    healtcheck:
+    test: ["CMD", "redis-cli", "-p", "6380", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
 
