@@ -1,0 +1,26 @@
+services:
+  web:
+  build: .
+  ports:
+    - "5000:5000"
+  environment:
+    - REDIS_HOST=redis
+    - REDIS_PORT=6380
+    - WELCOME_MSG=Привет из CI
+  depends_on:
+    redis:
+      condition: service_healthy
+   healthcheck:
+    test: ["CMD","python","-c","import urllib.request;urlib.request.urlopen('http://localhost:5000/')"]
+    interval: 10s
+    timeout: 3s
+    retries: 5
+
+redis:
+  image: redis:alpine
+  command: redis-server --port 6380
+  healtcheck:
+  test: ["CMD","redis-cli","6380","ping"]
+    interval: 10s
+    timeout: 3s
+    retries: 5
