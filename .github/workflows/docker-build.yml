@@ -45,6 +45,7 @@ jobs:
           IMAGE_ID=ghcr.io/${{ github.repository }}/myflask-web
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           docker run --rm -v $PWD:/workspace -w /workspace \
+            -e COSIGN_PASSWORD="" \
             gcr.io/projectsigstore/cosign:v2.4.3 \
             sign --key cosign.key --yes ${IMAGE_ID}:latest
 
