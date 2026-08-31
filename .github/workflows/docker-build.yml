@@ -47,7 +47,10 @@ jobs:
           docker run --rm -v $PWD:/workspace -w /workspace \
             -e COSIGN_PASSWORD="" \
             gcr.io/projectsigstore/cosign:v2.4.3 \
-            sign --key cosign.key --yes ${IMAGE_ID}:latest
+            sign --key cosign.key --yes \
+            --registry-username ${{ github.actor }} \
+            --registry-password ${{ secrets.GITHUB_TOKEN }} \
+            ${IMAGE_ID}:latest
 
       - name: Verify image signature
         run: |
@@ -55,9 +58,13 @@ jobs:
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           docker run --rm -v $PWD:/workspace -w /workspace \
             gcr.io/projectsigstore/cosign:v2.4.3 \
-            verify --key cosign.pub ${IMAGE_ID}:latest
+            verify --key cosign.pub \
+            --registry-username ${{ github.actor }} \
+            --registry-password ${{ secrets.GITHUB_TOKEN }} \
+            ${IMAGE_ID}:latest
       
       - name: Scan image with Trivy
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
           trivy image --severity CRITICAL --exit-code 1 myflask-web
+
