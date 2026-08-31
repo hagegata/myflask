@@ -39,6 +39,23 @@ jobs:
           docker tag myflask-web $IMAGE_ID:latest
           docker push $IMAGE_ID:latest
 
+      - name: Sign image with Cosign
+        run: |
+          echo "${{ secrets.COSIGN_PRIVATE_KEY }}" > cosign.key
+          IMAGE_ID=ghcr.io/${{ github.repository }}/myflask-web
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          docker run --rm -v $PWD:/workspace -w /workspace \
+            gcr.io/projectsigstore/cosign:v2.4.3 \
+            sign --key cosign.key --yes ${IMAGE_ID}:latest
+
+      - name: Verify image signature
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository }}/myflask-web
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          docker run --rm -v $PWD:/workspace -w /workspace \
+            gcr.io/projectsigstore/cosign:v2.4.3 \
+            verify --key cosign.pub ${IMAGE_ID}:latest
+      
       - name: Scan image with Trivy
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
